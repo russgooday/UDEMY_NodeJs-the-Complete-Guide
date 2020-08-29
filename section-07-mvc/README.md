@@ -5,7 +5,7 @@
 * Work with your data ( e.g. save fetch )
 
 #### Views
-* What the user sees ( The rendered output. e.g. Outputted with EJS, PUG, Handlebars, HTML etc )
+* What the user sees ( The output rendered with EJS, PUG, Handlebars, HTML etc )
 * Decoupled from your application code
 
 #### Routes and Controllers
