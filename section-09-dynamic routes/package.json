@@ -1,0 +1,23 @@
+{
+  "name": "boilerplate-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.0.0-alpha1",
+    "ejs": "^3.1.2",
+    "express": "^4.17.1",
+    "standard": "^14.3.4",
+    "stylint": "^2.0.0"
+  },
+  "devDependencies": {
+    "clone": "^2.1.2",
+    "nodemon": "^2.0.3"
+  }
+}

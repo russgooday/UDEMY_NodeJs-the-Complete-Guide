@@ -1,0 +1,28 @@
+/* --- Form Styling --- */
+
+.product-form{
+  width: 20rem;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.form-control {
+  margin-bottom: 15px;
+}
+
+.form-control label {
+  font-weight: 500;
+}
+
+.form-control label,
+.form-control input {
+  display: block;
+}
+
+.form-control input,
+.form-control textarea {
+  border: 1px solid #029c88;
+  font: inherit;
+}
+
+/* --- END Form Styling --- */

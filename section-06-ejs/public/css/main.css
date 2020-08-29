@@ -1,0 +1,189 @@
+/* --- Resets --- */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+body {
+    line-height: 1;
+}
+
+ul, ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    Box-sizing: Border-box
+}
+
+/* --- END Resets --- */
+
+body {
+    font: 300 1rem 'Roboto', arial, sans-serif;
+    color: #333;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-bottom: .5rem;
+}
+
+h2 {
+    font-size: 1.4rem;
+    font-weight: 300;
+    margin-bottom: .5rem;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+}
+
+li, a, button {
+    transition: all .2s linear;
+    transition-property: color, background-color, border-color;
+}
+
+header {
+    width: 100%;
+    padding-top: 10px;
+    color: #eee;
+    background: #006474;
+}
+
+main {
+    padding: 30px;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: .35rem;
+    color: #656565;
+}
+
+input {
+    width: 100%;
+    border-radius: 3px;
+    letter-spacing: .5px;
+    padding: 10px;
+}
+
+input:focus {
+    outline: none;
+    background-color: #eef;
+}
+
+button {
+    outline: none!important;
+    cursor: pointer;
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .35px;
+    padding: 10px 25px;
+    color: #eee;
+    background-color: #555;
+    border: none;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+button:hover,
+button:active {
+    background-color: #333;
+}
+
+/* --- Navigation Menu --- */
+
+.main-nav .item-list {
+    display: flex;
+}
+
+.main-nav .item-list > .item{
+    display: flex;
+    font-size: .9rem;
+    border-bottom: 4px solid transparent;
+}
+
+.main-nav .item-list > .item a {
+    letter-spacing: .75px;
+    padding: 20px 25px;
+}
+
+.main-nav li:active a,
+.main-nav li.active a{
+    color: #f8d300;
+}
+
+.main-nav .item-list > .item:hover,
+.main-nav .item-list > .item.active {
+    border-color: orange;
+}
+
+/* --- END Navigation Menu --- */
+
+/* --- grid --- */
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: stretch;
+}
+
+
+/* --- cards --- */
+
+.card {
+    max-width: 300px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    margin-bottom: 2rem;
+}
+
+.card-header,
+.card-content {
+    text-align: center;
+    padding: 1rem;
+}
+
+.card-content h1,
+.card-content h2,
+.card-content p {
+    text-align: center;
+    margin: 0 0 .5rem;
+}
+
+.card-image,
+.card-image img {
+    width: 100%;
+}
+
+.card-actions {
+    padding: 0 1rem 2rem;
+    text-align: center;
+}
+
+.card-actions button,
+.card-actions a {
+    margin: 0 0.25rem;
+}

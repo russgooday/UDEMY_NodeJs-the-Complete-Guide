@@ -1,0 +1,22 @@
+/* --- Products --- */
+
+.product-item {
+    width: 20rem;
+    max-width: 95%;
+}
+
+.product-title {
+    font-size: 1rem;
+    text-align: center;
+    margin: 0;
+}
+
+.product-price {
+    text-align: center;
+    color: #6d6d6d;
+    font-weight: 700;
+}
+
+.product-description {
+    text-align: center;
+}

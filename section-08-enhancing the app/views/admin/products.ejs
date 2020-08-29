@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang='en'>
+<%- include('../includes/head') %>
+<body>
+<%- include('../includes/header') %>
+    <main class='container'>
+        <div class='col'>
+            <h1><%= pageTitle %></h1>
+            <hr class='mb-4'>
+            <%_ if (locals.products && products.length) { -%>
+            <form class="grid" method='POST'>
+                <%_ for ({title, imageUrl, description, price} of products) { -%>
+                <fieldset class="card product-item">
+                    <header class="card-header">
+                        <h1 class="product-title"><%= title %></h1>
+                    </header>
+                    <div class="card-image">
+                        <img src="/images/<%= imageUrl %>" alt="<%= title %>"/>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="product-price">£<%= price %></h2>
+                        <p class="product-description"><%= description %></p>
+                    </div>
+                    <div class="card-actions">
+                        <button type='submit' class='btn' name='edit' value='<%= title %>' formaction='/admin/edit-product'>Edit</button>
+                        <button type='submit' class='btn' name='delete' value='<%= title %>' formaction='/admin/delete-product'>Delete</button>
+                    </div>
+                </fieldset>
+                <%_ } -%>
+            <%_ } else { -%>
+                <h1>No Products Found</h1>
+            <%_ } -%>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
+
