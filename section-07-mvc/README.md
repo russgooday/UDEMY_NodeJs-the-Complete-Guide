@@ -10,8 +10,8 @@
 
 #### Routes and Controllers
 ##### Routes
-Routes decide upon which path or which http method (POST GET) which controller is executed
+Depending upon which path or which http method ( POST/GET ), routes select which controller is executed
 
 ##### Controllers
-* Connecting your Models and your Views
+* Connect your Models and your Views
 * Contain the *in-between* logic
