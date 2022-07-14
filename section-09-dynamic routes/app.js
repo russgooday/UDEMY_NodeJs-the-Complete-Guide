@@ -1,21 +1,24 @@
-const path = require('path')
-const express = require('express')
-const ejs = require('ejs')
-const app = express()
-const adminRoutes = require('./routes/admin')
-const shopRoutes = require('./routes/shop')
-const errControl = require('./controllers/error')
-const port = 3000
+const path = require('path');
 
-app.set('view engine', 'ejs')
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// (body-parser) parses request bodies in middleware to req.body
-app.use(express.urlencoded({ extended: false }))
-// static links for css, images etc
-app.use(express.static(path.join(__dirname, '/public')))
+const errorController = require('./controllers/error');
 
-app.use('/admin', adminRoutes)
-app.use(shopRoutes)
-app.use(errControl.get404)
+const app = express();
 
-app.listen(port)
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
+
+app.use(errorController.get404);
+
+app.listen(3000);

@@ -1,69 +1,69 @@
-const Product = require('../models/product')
+const Products = require('../models/product')
+const Cart = require('../models/cart')
 
-const getIndex = (req, res) => {
-  Product.fetchAll(
-    products => {
-      res.render('shop/index', {
-        products,
-        pageTitle: 'Home',
-        path: req.originalUrl,
-        css: [
-          { url: '/css/product.css' }
-        ]
-      })
-    }
-  )
+exports.getProducts = async (req, res, next) => {
+  const products = await Products.fetchAll()
+
+  res.render('shop/product-list', {
+    prods: products,
+    pageTitle: 'All Products',
+    path: '/products'
+  })
 }
 
-const getProducts = (req, res) => {
-  Product.fetchAll(
-    products => {
-      res.render('shop/product-list', {
-        products,
-        pageTitle: 'Shop',
-        path: req.originalUrl,
-        css: [
-          { url: '/css/product.css' }
-        ]
-      })
-    }
-  )
+// expects an unformatted string and returns with paragraphs
+// e.g. 'text\n\r\n\r' returns '<p>text</p>'
+const formatParagraphs = (text) => (
+  text.replaceAll(/([^\n\r]+)(?:[\n\r]+)?/gm, '<p>$1</p>\n')
+)
+
+exports.getProduct = async (req, res, next) => {
+  const { productId } = req.params
+  const product = await Products.fetchById(productId)
+  const description = formatParagraphs(product.description)
+
+  res.render('shop/product-detail', {
+    product: { ...product, description },
+    pageTitle: product?.title ?? 'Product Not Found',
+    path: '/products'
+  })
 }
 
-const getCart = (req, res) => {
+exports.getIndex = async (req, res, next) => {
+  const products = await Products.fetchAll()
+
+  res.render('shop/index', {
+    prods: products,
+    pageTitle: 'Shop',
+    path: '/'
+  })
+}
+
+exports.getCart = async (req, res, next) => {
+  const cart = await Cart.fetch()
+  console.log(cart)
+
   res.render('shop/cart', {
-    pageTitle: 'Shopping Cart',
-    path: req.originalUrl,
-    css: [
-      { url: '/css/product.css' }
-    ]
+    path: '/cart',
+    pageTitle: 'Your Cart'
   })
 }
 
-const getOrders = (req, res) => {
+exports.postCart = (req, res, next) => {
+  Cart.add(req.body)
+  res.redirect('/cart')
+}
+
+exports.getOrders = (req, res, next) => {
   res.render('shop/orders', {
-    pageTitle: 'Orders',
-    path: req.originalUrl,
-    css: [
-      { url: '/css/product.css' }
-    ]
+    path: '/orders',
+    pageTitle: 'Your Orders'
   })
 }
 
-const getCheckout = (req, res) => {
+exports.getCheckout = (req, res, next) => {
   res.render('shop/checkout', {
-    pageTitle: 'Checkout',
-    path: req.originalUrl,
-    css: [
-      { url: '/css/product.css' }
-    ]
+    path: '/checkout',
+    pageTitle: 'Checkout'
   })
-}
-
-module.exports = {
-  getProducts,
-  getIndex,
-  getCart,
-  getOrders,
-  getCheckout
 }

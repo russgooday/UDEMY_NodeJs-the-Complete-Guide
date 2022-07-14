@@ -1,36 +1,82 @@
-const fs = require('fs')
+const fs = require('fs/promises')
 const path = require('path')
-const productsPath = path.join(`${process.mainModule.path}/data/products.json`)
+const { clone, set, lensProp } = require('ramda')
+const { v4: uuidv4 } = require('uuid')
 
-const getProductsFromFile = (callback) => {
-  fs.readFile(productsPath, (error, fileContent) => {
-    callback(!error && fileContent.length ? JSON.parse(fileContent) : [])
+const productsPath = path.join(
+  path.dirname(require.main.filename),
+  'data',
+  'products.json'
+)
+
+const getProductsFromFile = async function (filePath = productsPath) {
+  try {
+    const products = await fs.readFile(filePath, 'utf8')
+
+    return (products.length) ? JSON.parse(products) : []
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const saveProducts = async function (callback, filePath = productsPath) {
+  try {
+    const products = await getProductsFromFile()
+    const json = JSON.stringify(callback(products), null, 2)
+
+    await fs.writeFile(filePath, json)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const addProduct = async function (product, filePath = productsPath) {
+
+  saveProducts((products) => {
+    return clone(products).concat({ ...product })
   })
 }
 
-module.exports = class Product {
-  constructor ({ title, imageUrl, description, price }) {
-    this.title = title
-    this.imageUrl = imageUrl
-    this.description = description
-    this.price = price
-  }
+const updateProduct = async function (updatedProduct, filePath = productsPath) {
 
-  saveProductsToFile () {
-    getProductsFromFile(
-      products => {
-        products.push(this)
-        fs.writeFile(
-          productsPath,
-          JSON.stringify(products),
-          error => {
-            if (error) console.log(error)
-          })
-      }
+  saveProducts((products) => {
+    const productIndex = products.findIndex((product) => product.id === updatedProduct.id)
+
+    return set(lensProp(productIndex), { ...updatedProduct }, clone(products))
+  })
+}
+
+const deleteProduct = async function (id) {
+
+  saveProducts((products) => {
+    return clone(products).filter(
+      (product) => product.id !== id
     )
-  }
+  })
+}
 
-  static fetchAll (callback) {
-    getProductsFromFile(callback)
-  }
+const fetchById = async function (id) {
+  const products = await getProductsFromFile()
+
+  return products.find((product) => product.id === id)
+}
+
+const createProduct = (props) => ({
+  title: props.title,
+  author: props.author,
+  published: props.published,
+  imageUrl: props.imageUrl || '/images/no-image.png',
+  summary: props.summary,
+  description: props.description,
+  price: props.price,
+  id: props.id || uuidv4() // if an edit/update should have id already
+})
+
+module.exports = {
+  fetchById,
+  add: addProduct,
+  update: updateProduct,
+  delete: deleteProduct,
+  create: createProduct,
+  fetchAll: getProductsFromFile
 }

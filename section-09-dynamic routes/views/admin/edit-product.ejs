@@ -1,33 +1,86 @@
-<!DOCTYPE html>
-<html lang='en'>
-<%- include('../includes/head') %>
+<%- include('../includes/head.ejs') %>
+    <link rel='stylesheet' href='/css/forms.css'>
+    <link rel='stylesheet' href='/css/product.css'>
+</head>
+
 <body>
-<%- include('../includes/header') %>
-    <main class='container'>
-        <div class='col'>
-            <h1><%= pageTitle %></h1>
-            <hr class='mb-4'>
-            <form action='/admin/add-product' class='product-form' id='product-form' method='POST'>
-                <% const { title, imageUrl, price, description } = product %>
-                <div class='form-control'>
-                    <label for='title'>Title</label>
-                    <input type='text' id='title' name='title' value='<%= title %>' required>
-                </div>
-                <div class='form-control'>
-                    <label for='imageUrl'>Image Url</label>
-                    <input type='file' id='imageUrl' name='imageUrl' value='<%= imageUrl %>' required>
-                </div>
-                <div class='form-control'>
-                    <label for='price'>Price</label>
-                    <input type='number' id='price' name='price' value='<%= price %>' step='0.01' required>
-                </div>
-                <div class='form-control'>
-                    <label for='description'>Description</label>
-                    <textarea id='description' name='description' form='product-form' rows='5' required><%= description %></textarea>
-                </div>
-                <button type='submit' class='cart'>Save Changes</button>
-            </form>
-        </div>
+   <%- include('../includes/navigation.ejs') %>
+
+    <main class='centered'>
+        <form
+            class='product-form'
+            action='<%- path %>'
+            method='POST'
+        >
+            <div class='form-control'>
+                <label for='title'>Title</label>
+                <input
+                    type='text'
+                    name='title'
+                    id='title'
+                    value='<%- product?.title %>'
+                >
+            </div>
+            <div class='form-control'>
+                <label for='author'>Author</label>
+                <input
+                    type='text'
+                    name='author'
+                    id='author'
+                    value='<%- product?.author %>'
+                >
+            </div>
+            <div class='form-control'>
+                <label for='published'>Published</label>
+                <input
+                    type='text'
+                    name='published'
+                    id='published'
+                    placeholder='January 1st 2022'
+                    value='<%- product?.published %>'
+                >
+            </div>
+            <div class='form-control'>
+                <label for='imageUrl'>Image URL</label>
+                <input
+                    type='text'
+                    name='imageUrl'
+                    id='imageUrl'
+                    value='<%- product?.imageUrl %>'
+                >
+            </div>
+            <div class='form-control'>
+                <label for='price'>Price</label>
+                <input
+                    type='number'
+                    name='price'
+                    id='price'
+                    step='0.01'
+                    value='<%- product?.price %>'
+                >
+            </div>
+            <div class='form-control'>
+                <label for='summary'>Summary</label>
+                <textarea
+                    class='resize-disabled'
+                    name='summary'
+                    id='summary'
+                    rows='3'
+                    maxlength='100'
+                ><%- product?.summary %></textarea>
+            </div>
+            <div class='form-control'>
+                <label for='description'>Description</label>
+                <textarea
+                    name='description'
+                    id='description'
+                    rows='7'
+                ><%- product?.description %></textarea>
+            </div>
+            <button class='btn' type='submit'><%- buttonTitle %></button>
+            <% if (editing) { %>
+            <input type='hidden' name='id' value='<%- product.id %>'>
+            <% } %>
+        </form>
     </main>
-</body>
-</html>
+<%- include('../includes/end.ejs') %>
