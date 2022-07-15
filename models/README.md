@@ -1,7 +1,7 @@
 ### Sample of code from tutorial.
 The following is a sample from the tutorial's models/products.js, which adds CRUD functionality.
 
-```
+```javascript
 save() {
     getProductsFromFile(products => {
       if (this.id) {
@@ -42,7 +42,7 @@ I opted to create separate functions, which for one avoided the save function ha
 To achieve this I added a callback parameter to the save function, which then passes the products array to the given callback — that could be a callback which filters out a product we want to delete — before saving the returned result.
 
 Furthermore I used ramda js for deep cloning and setting, to avoid mutating the passed in products array.
-```
+```javascript
 const { clone, set, lensProp } = require('ramda')
 ...
 
