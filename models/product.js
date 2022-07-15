@@ -30,14 +30,14 @@ const saveProducts = async function (callback, filePath = productsPath) {
   }
 }
 
-const addProduct = async function (product, filePath = productsPath) {
+const addProduct = function (product, filePath = productsPath) {
 
   saveProducts((products) => {
     return clone(products).concat({ ...product })
   })
 }
 
-const updateProduct = async function (updatedProduct, filePath = productsPath) {
+const updateProduct = function (updatedProduct, filePath = productsPath) {
 
   saveProducts((products) => {
     const productIndex = products.findIndex((product) => product.id === updatedProduct.id)
@@ -46,7 +46,7 @@ const updateProduct = async function (updatedProduct, filePath = productsPath) {
   })
 }
 
-const deleteProduct = async function (id) {
+const deleteProduct = function (id) {
 
   saveProducts((products) => {
     return clone(products).filter(
