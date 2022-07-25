@@ -109,6 +109,7 @@ const lensPath = (path) => lens(getByPath(path), setByPath(path))
 const lensProp = (key) => lens(getField(key), setField(key))
 
 /**
+ * set
  * @param {Object} lens
  * @param {Object|Primitive} value
  * @param {Object|Array} obj
@@ -120,6 +121,7 @@ const lensProp = (key) => lens(getField(key), setField(key))
 const set = curry3((lens, value, obj) => lens.setter(value, deepClone(obj)))
 
 /**
+ * over
  * @param {Object} lens
  * @param {Function} value
  * @param {Object|Array} obj
