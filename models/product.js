@@ -1,6 +1,7 @@
 const fs = require('fs/promises')
 const path = require('path')
-const { clone, set, lensProp } = require('ramda')
+const { deepClone } = require('./helpers/clone')
+const { setField } = require('./helpers/accessors')
 const { v4: uuidv4 } = require('uuid')
 
 const productsPath = path.join(
@@ -33,23 +34,25 @@ const saveProducts = async function (callback, filePath = productsPath) {
 const addProduct = function (product, filePath = productsPath) {
 
   saveProducts((products) => {
-    return clone(products).concat({ ...product })
+    return deepClone(products).concat({ ...product })
   })
 }
 
 const updateProduct = function (updatedProduct, filePath = productsPath) {
 
   saveProducts((products) => {
-    const productIndex = products.findIndex((product) => product.id === updatedProduct.id)
+    const foundIndex = products.findIndex(
+      (product) => product.id === updatedProduct.id
+    )
 
-    return set(lensProp(productIndex), { ...updatedProduct }, clone(products))
+    return setField(foundIndex, { ...updatedProduct }, products)
   })
 }
 
 const deleteProduct = function (id) {
 
   saveProducts((products) => {
-    return clone(products).filter(
+    return deepClone(products).filter(
       (product) => product.id !== id
     )
   })

@@ -1,5 +1,5 @@
-### Sample of code from tutorial.
-The following is a sample from the tutorial's models/products.js, which adds CRUD functionality.
+### Sample from tutorial.
+The following is a sample where CRUD functionality has been added to the tutorial's models/products.js
 
 ```javascript
 save() {
@@ -35,16 +35,32 @@ save() {
     });
   }
 ```
-### A different approach
+### Callbacks instead
 
-I opted to create separate functions, which for one avoided the save function having to use if/else blocks and perform multiple tasks — one function, one task!
+Instead of hard-coding the save function to update and add products, I opted to have the function take a callback instead.
 
-To achieve this I added a callback parameter to the save function, which then passes the products array to the given callback — that could be a callback which filters out a product we want to delete — before saving the returned result.
+The given callback is applied to the fetched products array before saving the returned result. As an example the callback could be a function which filters out a product that needs to be deleted.
 
-Furthermore I used ramda js for deep cloning and setting, to avoid mutating the passed in products array.
+By doing it this way I could separate the CRUD tasks into separate functions — one task one function!
+
+#### Functional programming
+
+In addition I created [deep cloning](./helpers/clone.js) and [setting](./helpers/accessors.js) functions. Unlike the ...spread shallow clone used in the tutorial these functions properly avoid mutating the fetched products.
+
+I had previously written base versions of these scripts and in my tests the final deepClone was considerably more performant than JSON.parse/JSON.stringify or lodash's cloneDeep — about 4x faster in firefox and 2.5-3x in chrome.
+
 ```javascript
-const { clone, set, lensProp } = require('ramda')
+// import functional helper scripts
+const { deepClone } = require('./helpers/clone')
+const { setField } = require('./helpers/accessors')
 ...
+
+/**
+ * saveProducts
+ * @params{function} callback
+ * @params{String} filePath
+ * apply callback to fetched products and save returned result to file.
+ */
 
 const saveProducts = async function (callback, filePath = productsPath) {
   try {
@@ -60,28 +76,30 @@ const saveProducts = async function (callback, filePath = productsPath) {
 const addProduct = function (product) {
 
   saveProducts((products) => {
-    return clone(products).concat({ ...product })
+    return deepClone(products).concat({ ...product })
   })
 }
 
 const updateProduct = function (updatedProduct) {
 
   saveProducts((products) => {
-    const productIndex = products.findIndex(
+    const foundIndex = products.findIndex(
       (product) => product.id === updatedProduct.id
     )
-    // using ramdajs' lens methods to replace the product
-    return set(lensProp(productIndex), { ...updatedProduct }, clone(products))
+
+    return setField(foundIndex, { ...updatedProduct }, products)
   })
 }
 
 const deleteProduct = function (id) {
 
   saveProducts((products) => {
-    return clone(products).filter(
+    return deepClone(products).filter(
       (product) => product.id !== id
     )
   })
 }
 ...
 ```
+
+At this point in the tutorial I think that using callbacks is an improvement over the hard-coded version.
