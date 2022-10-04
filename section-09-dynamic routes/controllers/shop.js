@@ -40,10 +40,18 @@ exports.getIndex = async (req, res, next) => {
 }
 
 exports.getCart = async (req, res, next) => {
-  const cart = await Cart.fetch()
-  console.log(cart)
+  const products = await Products.fetchAll()
+  const cart = await Cart.fetchAll()
+
+  const items = products.flatMap(({ id, title, price }) => {
+    const { quantity } = cart.items.find((item) => item.id === id)
+
+    return (quantity) ? [{ id, title, price, quantity }] : []
+  })
 
   res.render('shop/cart', {
+    items,
+    totalPrice: cart.totalPrice,
     path: '/cart',
     pageTitle: 'Your Cart'
   })

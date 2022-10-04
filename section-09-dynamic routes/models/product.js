@@ -1,6 +1,8 @@
 const fs = require('fs/promises')
 const path = require('path')
-const { clone, set, lensProp } = require('ramda')
+const Cart = require('./cart')
+const { deepClone } = require('./helpers/clone')
+const { setField } = require('./helpers/accessors')
 const { v4: uuidv4 } = require('uuid')
 
 const productsPath = path.join(
@@ -24,35 +26,41 @@ const saveProducts = async function (callback, filePath = productsPath) {
     const products = await getProductsFromFile()
     const json = JSON.stringify(callback(products), null, 2)
 
-    await fs.writeFile(filePath, json)
+    await fs.writeFile(filePath, json, (err) => {
+      if (!err) console.log('file saved')
+    })
   } catch (err) {
     console.error(err)
   }
 }
 
-const addProduct = async function (product, filePath = productsPath) {
+const addProduct = function (product) {
 
   saveProducts((products) => {
-    return clone(products).concat({ ...product })
+    return deepClone(products).concat({ ...product })
   })
 }
 
-const updateProduct = async function (updatedProduct, filePath = productsPath) {
+const updateProduct = function (updatedProduct) {
 
   saveProducts((products) => {
-    const productIndex = products.findIndex((product) => product.id === updatedProduct.id)
+    const foundIndex = products.findIndex(
+      (product) => product.id === updatedProduct.id
+    )
 
-    return set(lensProp(productIndex), { ...updatedProduct }, clone(products))
+    return setField(foundIndex, { ...updatedProduct }, products)
   })
 }
 
-const deleteProduct = async function (id) {
+const deleteProduct = async function ({ id, price }) {
 
-  saveProducts((products) => {
-    return clone(products).filter(
+  await saveProducts((products) => {
+    return deepClone(products).filter(
       (product) => product.id !== id
     )
   })
+
+  Cart.delete({ id, price })
 }
 
 const fetchById = async function (id) {
