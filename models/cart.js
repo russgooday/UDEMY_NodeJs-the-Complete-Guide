@@ -1,5 +1,6 @@
 const fs = require('fs/promises')
 const path = require('path')
+const { deepClone } = require('./helpers/clone')
 
 const cartPath = path.join(
   path.dirname(require.main.filename),
@@ -7,7 +8,7 @@ const cartPath = path.join(
   'cart.json'
 )
 
-const CreateEmptyCart = () => ({ products: [], totalPrice: 0 })
+const CreateEmptyCart = () => ({ items: [], totalPrice: 0 })
 
 const getCartFromFile = async function (filePath = cartPath) {
   try {
@@ -30,30 +31,65 @@ const saveCartToFile = async function (callback, filePath = cartPath) {
   }
 }
 
-const deepClone = (source) => JSON.parse(JSON.stringify(source))
+const addItem = function (items, { id, ...props }) {
+  const clone = deepClone(items)
+  const foundItem = clone.find((item) => item.id === id)
 
-const addProduct = function (products, { id, ...props }) {
-  const clone = deepClone(products)
-  const foundProduct = clone.find((product) => product.id === id)
-
-  if (foundProduct) {
-    foundProduct.quantity += 1
+  // if found just update quantity
+  if (foundItem) {
+    foundItem.quantity += 1
     return clone
   }
 
+  // or add product to cart
   return clone.concat({ id, quantity: 1, ...props })
 }
 
-const addProductToCart = function (product) {
+const deleteItem = function (items, id) {
+  const clone = deepClone(items)
+  const foundItem = clone.find((item) => item.id === id)
+
+  // if more than one found just update quantity
+  if (foundItem?.quantity > 1) {
+    foundItem.quantity -= 1
+    return clone
+  }
+
+  // or delete item from cart
+  return clone.filter((item) => item.id !== id)
+}
+
+const addToCart = function (item) {
   saveCartToFile(
     (cart) => ({
-      products: addProduct(cart.products, product),
-      totalPrice: cart.totalPrice + Number(product.price)
+      items: addItem(cart.items, item),
+      totalPrice: cart.totalPrice + Number(item.price)
     })
   )
 }
 
+const deleteFromCart = function (id) {
+  saveCartToFile(
+    ({ items, totalPrice }) => {
+
+      return items.reduce((cart, item) => {
+
+        // if not item to delete add item to cart
+        if (item.id !== id) {
+          cart.items.push(item)
+          return cart
+        }
+
+        // otherwise it is item to delete, so just update totalPrice
+        cart.totalPrice -= Number(item.price) * Number(item.quantity)
+        return cart
+      }, { items: [], totalPrice })
+    }
+  )
+}
+
 module.exports = {
-  fetch: getCartFromFile,
-  add: addProductToCart
+  fetchAll: getCartFromFile,
+  add: addToCart,
+  delete: deleteFromCart
 }

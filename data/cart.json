@@ -1,20 +1,20 @@
 {
-  "products": [
-    {
-      "id": "4af77e8c-57f1-4ada-a6ae-ca4ae852d253",
-      "qty": 1,
-      "price": "7.22"
-    },
-    {
-      "id": "97aabdc9-213c-4933-af8f-71a153bdb7e0",
-      "quantity": 2,
-      "price": "11.99"
-    },
+  "items": [
     {
       "id": "c05bd80e-49c0-4675-965f-d2a5ae9ef6d2",
-      "quantity": 2,
-      "price": "11.11"
+      "quantity": 3,
+      "price": "14.11"
+    },
+    {
+      "id": "4af77e8c-57f1-4ada-a6ae-ca4ae852d253",
+      "quantity": 1,
+      "price": "8.32"
+    },
+    {
+      "id": "12c1617c-d30b-4cad-ae8e-ec5db2eb285b",
+      "quantity": 3,
+      "price": "12.99"
     }
   ],
-  "totalPrice": 55.42
+  "totalPrice": 89.62
 }

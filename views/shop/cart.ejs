@@ -3,4 +3,36 @@
 
     <body>
         <%- include('../includes/navigation.ejs') %>
+        <main>
+            <% if (items?.length > 0) { %>
+                <section class='cart-items'>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <% for (let item of items) { %>
+                            <tr>
+                                <td><%- item.title %></td>
+                                <td><%- item.quantity %></td>
+                                <td><%- item.price %></td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>Total:</td>
+                                <td><%- totalPrice %></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </section>
+            <% } else { %>
+                <h1>Cart is Empty!</h1>
+            <% } %>
+        </main>
         <%- include('../includes/end.ejs') %>

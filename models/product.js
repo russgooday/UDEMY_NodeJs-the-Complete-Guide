@@ -1,5 +1,6 @@
 const fs = require('fs/promises')
 const path = require('path')
+const Cart = require('./cart')
 const { deepClone } = require('./helpers/clone')
 const { setField } = require('./helpers/accessors')
 const { v4: uuidv4 } = require('uuid')
@@ -25,20 +26,22 @@ const saveProducts = async function (callback, filePath = productsPath) {
     const products = await getProductsFromFile()
     const json = JSON.stringify(callback(products), null, 2)
 
-    await fs.writeFile(filePath, json)
+    await fs.writeFile(filePath, json, (err) => {
+      if (!err) console.log('file saved')
+    })
   } catch (err) {
     console.error(err)
   }
 }
 
-const addProduct = function (product, filePath = productsPath) {
+const addProduct = function (product) {
 
   saveProducts((products) => {
     return deepClone(products).concat({ ...product })
   })
 }
 
-const updateProduct = function (updatedProduct, filePath = productsPath) {
+const updateProduct = function (updatedProduct) {
 
   saveProducts((products) => {
     const foundIndex = products.findIndex(
@@ -49,13 +52,15 @@ const updateProduct = function (updatedProduct, filePath = productsPath) {
   })
 }
 
-const deleteProduct = function (id) {
+const deleteProduct = async function ({ id, price }) {
 
-  saveProducts((products) => {
+  await saveProducts((products) => {
     return deepClone(products).filter(
       (product) => product.id !== id
     )
   })
+
+  Cart.delete({ id, price })
 }
 
 const fetchById = async function (id) {
