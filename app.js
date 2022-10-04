@@ -1,4 +1,3 @@
-// test to see if push is working
 const path = require('path')
 
 const express = require('express')
