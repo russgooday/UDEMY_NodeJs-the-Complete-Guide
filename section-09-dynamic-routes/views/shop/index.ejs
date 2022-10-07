@@ -1,0 +1,38 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/product.css">
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+
+    <main>
+        <% if (prods.length > 0) { %>
+            <div class="grid">
+                <% for (let product of prods) { %>
+                    <article class="card product-item">
+                        <h1 class="card__title"><%= product.title %></h1>
+                        <div class="card__image">
+                            <img
+                                src="/images/<%= product.image %>"
+                                alt="<%= product.title %>"
+                            >
+                        </div>
+                        <div class="card__content">
+                            <h2 class="product-item__price"><%- formatCurrency(product.price) %></h2>
+                            <p class="product-item__summary"><%- product.summary %></p>
+                        </div>
+                        <div class="card__actions">
+                            <!--
+                                Inside a for loop 'product' is a local variable and we must pass it explicitly
+                                to the ejs template file
+                            -->
+                            <%- include('../includes/add-to-cart.ejs', { product }) %>
+                        </div>
+                    </article>
+                <% } %>
+            </div>
+        <% } else { %>
+            <h1>No Products Found!</h1>
+        <% } %>
+    </main>
+<%- include('../includes/end.ejs') %>
