@@ -8,18 +8,18 @@
                 <section class='product-detail'>
                     <% if (product !== undefined) { %>
                         <div class='product-detail__image'>
-                            <img src='<%= product.imageUrl %>' alt='<%= product.title %>'>
+                            <img src='/images/<%= product.image %>' alt='<%= product.title %>'>
                         </div>
                         <section class='product-detail__spec'>
                             <h1><%= product.title %></h1>
                             <hr>
-                            <h2 class='price'>£<%= product.price %></h2>
+                            <h2 class='price'><%= formatCurrency(product.price) %></h2>
                             <p><span class='author text__secondary bold'><%= product.author %></span> (author)</p>
                             <p>Published <%= product.published %></p>
                             <article class='description'>
                                 <% if (product.description) { %>
                                     <h3 class='bold'>Description</h3>
-                                    <%- product.description %>
+                                    <%- formatParagraphs(product.description) %>
                                 <% } else { %>
                                     <h3 class='bold'>Summary</h3>
                                     <p><%= product.summary %></p>

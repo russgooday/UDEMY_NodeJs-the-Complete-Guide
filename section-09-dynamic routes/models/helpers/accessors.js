@@ -131,6 +131,10 @@ const set = curry3((lens, value, obj) => lens.setter(value, deepClone(obj)))
  */
 const over = curry3((lens, mapFn, obj) => lens.setter(mapFn(lens.getter(obj)), deepClone(obj)))
 
+const not = (a) => !a
+
+const propEquals = curry3((name, val, obj) => val === obj[name])
+
 module.exports = {
   deepClone,
   getField,
@@ -139,5 +143,7 @@ module.exports = {
   lensPath,
   lensProp,
   set,
-  over
+  over,
+  not,
+  propEquals
 }

@@ -1,6 +1,8 @@
 const fs = require('fs/promises')
 const path = require('path')
 const { deepClone } = require('./helpers/clone')
+const { propEquals } = require('./helpers/accessors')
+const idEquals = propEquals('id')
 
 const cartPath = path.join(
   path.dirname(require.main.filename),
@@ -8,13 +10,16 @@ const cartPath = path.join(
   'cart.json'
 )
 
-const CreateEmptyCart = () => ({ items: [], totalPrice: 0 })
+const createCart = () => ({
+  items: [],
+  totalPrice: 0
+})
 
 const getCartFromFile = async function (filePath = cartPath) {
   try {
     const cart = await fs.readFile(filePath, 'utf8')
 
-    return (cart) ? JSON.parse(cart) : CreateEmptyCart()
+    return (cart) ? JSON.parse(cart) : createCart()
   } catch (err) {
     console.error(err)
   }
@@ -31,59 +36,62 @@ const saveCartToFile = async function (callback, filePath = cartPath) {
   }
 }
 
-const addItem = function (items, { id, ...props }) {
-  const clone = deepClone(items)
-  const foundItem = clone.find((item) => item.id === id)
+const addToCart = async function (id, productPrice) {
+  await saveCartToFile(
+    (cart) => {
+      const clone = deepClone(cart)
+      const foundItem = clone.items.find(idEquals(id))
 
-  // if found just update quantity
-  if (foundItem) {
-    foundItem.quantity += 1
-    return clone
-  }
+      if (foundItem) {
+        foundItem.quantity += 1
+        foundItem.subTotal = foundItem.quantity * productPrice
+      } else {
+        clone.items.push({ id, subTotal: productPrice, quantity: 1 })
+      }
 
-  // or add product to cart
-  return clone.concat({ id, quantity: 1, ...props })
-}
-
-const deleteItem = function (items, id) {
-  const clone = deepClone(items)
-  const foundItem = clone.find((item) => item.id === id)
-
-  // if more than one found just update quantity
-  if (foundItem?.quantity > 1) {
-    foundItem.quantity -= 1
-    return clone
-  }
-
-  // or delete item from cart
-  return clone.filter((item) => item.id !== id)
-}
-
-const addToCart = function (item) {
-  saveCartToFile(
-    (cart) => ({
-      items: addItem(cart.items, item),
-      totalPrice: cart.totalPrice + Number(item.price)
-    })
+      clone.totalPrice = clone.totalPrice + productPrice
+      return clone
+    }
   )
 }
 
-const deleteFromCart = function (id) {
-  saveCartToFile(
-    ({ items, totalPrice }) => {
+const updateCart = async function (id, price, quantity) {
+  await saveCartToFile(
+    (cart) => {
+      return cart.items.reduce((cart, item) => {
+        const clonedItem = { ...item }
 
-      return items.reduce((cart, item) => {
+        // there is a match update the cart item subTotal
+        if (item.id === id) {
+          if (!isNaN(quantity)) clonedItem.quantity = quantity
 
-        // if not item to delete add item to cart
-        if (item.id !== id) {
-          cart.items.push(item)
-          return cart
+          clonedItem.subTotal = clonedItem.quantity * price
         }
 
-        // otherwise it is item to delete, so just update totalPrice
-        cart.totalPrice -= Number(item.price) * Number(item.quantity)
+        cart.items.push(clonedItem)
+        // add each subTotal to totalPrice
+        cart.totalPrice += clonedItem.subTotal
+
         return cart
-      }, { items: [], totalPrice })
+      }, { items: [], totalPrice: 0 })
+    }
+  )
+}
+
+const removeFromCart = async function (id) {
+  await saveCartToFile(
+    (cart) => {
+      let totalPrice = cart.totalPrice
+
+      const items = cart.items.flatMap((item) => {
+        if (item.id === id) {
+          totalPrice -= item.subTotal
+          return []
+        }
+        return { ...item }
+      })
+
+      return { items, totalPrice }
     }
   )
 }
@@ -91,5 +99,6 @@ const deleteFromCart = function (id) {
 module.exports = {
   fetchAll: getCartFromFile,
   add: addToCart,
-  delete: deleteFromCart
+  remove: removeFromCart,
+  update: updateCart
 }

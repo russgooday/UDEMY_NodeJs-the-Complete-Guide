@@ -1,37 +1,53 @@
 <%- include('../includes/head.ejs') %>
+    <link rel='stylesheet' href='/css/cart.css'>
     </head>
     <body>
         <%- include('../includes/navigation.ejs') %>
         <main>
-            <% if (items?.length > 0) { %>
-                <section class='cart-items'>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <% for (let item of items) { %>
-                            <tr>
-                                <td><%- item.title %></td>
-                                <td><%- item.quantity %></td>
-                                <td><%- item.price %></td>
-                            </tr>
-                        <% } %>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td>Total:</td>
-                                <td><%- totalPrice %></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+        <% if (items?.length > 0) { %>
+            <div class='shopping-cart-container'>
+                <section class='cart-items-container'>
+                    <h2 class='cart-header'>Shopping cart details</h2>
+                    <ul class='cart-items'>
+                    <% for (let item of items) { %>
+                        <li class='cart-item'>
+                            <div class='cart-item-info-container'>
+                                <img src='/images/cart-images/<%- item.image %>' class='cart-image' alt=''>
+                                <div class='cart-item-info'>
+                                    <h3 class='cart-item-title'><%- item.title %></h3>
+                                    <p class='cart-item-author'><span class='author text__secondary bold'><%- item.author %></span></p>
+                                    <p class='cart-item-price'><%- formatCurrency(item.price) %></p>
+                                </div>
+                            </div>
+                            <div class='cart-item-checkout-container'>
+                                <div class='cart-item-quantity'>
+                                    <p>Quantity <%- item.quantity %></p>
+                                </div>
+                                <p class='cart-item-total'><%- formatCurrency(item.subTotal) %></p>
+                                <form action='/cart-remove-item' method='post'>
+                                    <input type='hidden' name='id' value='<%- item.id %>'>
+                                    <button type='submit'>remove</button>
+                                </form>
+                            </div>
+                        </li>
+                    <% } %>
+                    </ul>
                 </section>
-            <% } else { %>
-                <h1>Cart is Empty!</h1>
-            <% } %>
+                <section class='cart-total-container'>
+                    <div class='cart-total'>
+                        <dl>
+                            <dt>Delivery Cost</dt>
+                            <dd>FREE</dd>
+                        </dl>
+                        <dl class='total'>
+                            <dt>Total</dt>
+                            <dd class='cart-item-total'><%- formatCurrency(totalPrice) %></dd>
+                        </dl>
+                    </div>
+                </section>
+            </div>
+        <% } else { %>
+            <h1>Cart is Empty!</h1>
+        <% } %>
         </main>
-        <%- include('../includes/end.ejs') %>
+    <%- include('../includes/end.ejs') %>

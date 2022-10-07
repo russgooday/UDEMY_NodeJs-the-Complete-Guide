@@ -2,8 +2,11 @@ const fs = require('fs/promises')
 const path = require('path')
 const Cart = require('./cart')
 const { deepClone } = require('./helpers/clone')
-const { setField } = require('./helpers/accessors')
+const { propEquals, not } = require('./helpers/accessors')
 const { v4: uuidv4 } = require('uuid')
+
+const idEquals = propEquals('id')
+const idNotEquals = (val) => not(propEquals('id', val))
 
 const productsPath = path.join(
   path.dirname(require.main.filename),
@@ -37,46 +40,52 @@ const saveProducts = async function (callback, filePath = productsPath) {
 const addProduct = function (product) {
 
   saveProducts((products) => {
-    return deepClone(products).concat({ ...product })
+    const updatedProducts = deepClone(products)
+    updatedProducts.push({ ...product })
+
+    return updatedProducts
   })
 }
 
-const updateProduct = function (updatedProduct) {
+const updateProduct = async function (updatedProduct) {
+  const { id, price } = updatedProduct
 
-  saveProducts((products) => {
-    const foundIndex = products.findIndex(
-      (product) => product.id === updatedProduct.id
-    )
+  await saveProducts(
+    (products) => {
+      return products.map(
+        (product) => (product.id === id)
+          ? { ...updatedProduct }
+          : { ...product }
+      )
+    }
+  )
 
-    return setField(foundIndex, { ...updatedProduct }, products)
-  })
+  Cart.update(id, price)
 }
 
-const deleteProduct = async function ({ id, price }) {
+const deleteProduct = async function (id) {
 
   await saveProducts((products) => {
-    return deepClone(products).filter(
-      (product) => product.id !== id
-    )
+    return deepClone(products).filter(idNotEquals(id))
   })
 
-  Cart.delete({ id, price })
+  Cart.delete(id)
 }
 
 const fetchById = async function (id) {
   const products = await getProductsFromFile()
 
-  return products.find((product) => product.id === id)
+  return products.find(idEquals(id))
 }
 
 const createProduct = (props) => ({
   title: props.title,
   author: props.author,
   published: props.published,
-  imageUrl: props.imageUrl || '/images/no-image.png',
+  image: props.image || 'no-image.png',
   summary: props.summary,
   description: props.description,
-  price: props.price,
+  price: Number(props.price),
   id: props.id || uuidv4() // if an edit/update should have id already
 })
 

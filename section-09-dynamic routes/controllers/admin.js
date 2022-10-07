@@ -1,4 +1,5 @@
 const Products = require('../models/product')
+const { formatCurrency } = require('../models/helpers/general')
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -49,6 +50,7 @@ exports.getProducts = async (req, res, next) => {
   const products = await Products.fetchAll()
 
   res.render('admin/products', {
+    formatCurrency,
     prods: products,
     pageTitle: 'Admin Products',
     path: '/admin/products'

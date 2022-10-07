@@ -1,29 +1,27 @@
 const Products = require('../models/product')
 const Cart = require('../models/cart')
+const { propEquals } = require('../models/helpers/accessors')
+const { formatCurrency, formatParagraphs } = require('../models/helpers/general')
 
 exports.getProducts = async (req, res, next) => {
   const products = await Products.fetchAll()
 
   res.render('shop/product-list', {
+    formatCurrency,
     prods: products,
     pageTitle: 'All Products',
     path: '/products'
   })
 }
 
-// expects an unformatted string and returns with paragraphs
-// e.g. 'text\n\r\n\r' returns '<p>text</p>'
-const formatParagraphs = (text) => (
-  text.replaceAll(/([^\n\r]+)(?:[\n\r]+)?/gm, '<p>$1</p>\n')
-)
-
 exports.getProduct = async (req, res, next) => {
   const { productId } = req.params
   const product = await Products.fetchById(productId)
-  const description = formatParagraphs(product.description)
 
   res.render('shop/product-detail', {
-    product: { ...product, description },
+    product,
+    formatCurrency,
+    formatParagraphs,
     pageTitle: product?.title ?? 'Product Not Found',
     path: '/products'
   })
@@ -33,6 +31,7 @@ exports.getIndex = async (req, res, next) => {
   const products = await Products.fetchAll()
 
   res.render('shop/index', {
+    formatCurrency,
     prods: products,
     pageTitle: 'Shop',
     path: '/'
@@ -42,23 +41,42 @@ exports.getIndex = async (req, res, next) => {
 exports.getCart = async (req, res, next) => {
   const products = await Products.fetchAll()
   const cart = await Cart.fetchAll()
+  const cartItems = cart.items.flatMap(({ id, quantity, subTotal }) => {
+    const product = products.find(propEquals('id', id))
 
-  const items = products.flatMap(({ id, title, price }) => {
-    const { quantity } = cart.items.find((item) => item.id === id)
+    if (!product) return []
 
-    return (quantity) ? [{ id, title, price, quantity }] : []
+    return {
+      id,
+      quantity,
+      subTotal,
+      title: product.title,
+      author: product.author,
+      price: product.price,
+      image: product.image
+    }
   })
 
   res.render('shop/cart', {
-    items,
-    totalPrice: cart.totalPrice,
+    formatCurrency,
     path: '/cart',
-    pageTitle: 'Your Cart'
+    pageTitle: 'Your Cart',
+    items: cartItems,
+    totalPrice: cart.totalPrice
   })
 }
 
-exports.postCart = (req, res, next) => {
-  Cart.add(req.body)
+exports.postCart = async (req, res, next) => {
+  const product = await Products.fetchById(req.body.id)
+
+  Cart.add(product.id, product.price)
+  res.redirect('/cart')
+}
+
+exports.postRemoveItem = (req, res, next) => {
+  const id = req.body.id
+
+  Cart.remove(id)
   res.redirect('/cart')
 }
 
