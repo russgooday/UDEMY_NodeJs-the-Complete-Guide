@@ -1,3 +1,5 @@
+<img src='udemy.ico' width='50'>
+
 ## NodeJS The Complete Guide (MVC, REST APIs, GraphQL, Deno)
 #### Taught by Maximilian Schwarzmüller (Udemy/Academind)
 
