@@ -1,5 +1,5 @@
-const Products = require('../models/product')
-const { formatCurrency } = require('../models/helpers/general')
+const Product = require('../models/product')
+const { formatCurrency, removeEmptyProps } = require('../models/helpers/general')
 
 exports.getAddProduct = (req, res) => {
   res.render('admin/edit-product', {
@@ -13,47 +13,76 @@ exports.getAddProduct = (req, res) => {
 
 exports.getEditProduct = async (req, res) => {
   const id = req.params.productId
-  const [[product]] = await Products.fetchById(id)
+  const user = req.user
   const editMode = req.query.edit
 
-  res.render('admin/edit-product', {
-    product,
-    pageTitle: 'Edit Product',
-    buttonTitle: 'Update Product',
-    path: '/admin/edit-product',
-    editing: editMode === 'true'
-  })
+  try {
+    const [product] = await user.getProducts({ where: { id } })
+
+    res.render('admin/edit-product', {
+      product,
+      pageTitle: 'Edit Product',
+      buttonTitle: 'Update Product',
+      path: '/admin/edit-product',
+      editing: editMode === 'true'
+    })
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 exports.postAddProduct = async (req, res) => {
-  const product = Products.createProduct(req.body)
+  const { user, body } = req
+  const props = removeEmptyProps(body)
 
-  await Products.add(product)
-  res.redirect('/admin/products')
+  try {
+    await user.createProduct(props)
+    res.redirect('/admin/products')
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 exports.postEditProduct = async (req, res) => {
   const { id, ...props } = req.body
-  const product = Products.createProduct(props)
 
-  await Products.update(id, product)
-  res.redirect('/admin/products')
+  try {
+    await Product.update(
+      removeEmptyProps(props),
+      {
+        where: { id }
+      }
+    )
+    res.redirect('/admin/products')
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 exports.postDeleteProduct = async (req, res) => {
-  const id = req.body['product-id']
+  const id = req.body.id
 
-  await Products.delete(id)
-  res.redirect('/admin/products')
+  try {
+    await Product.destroy({ where: { id } })
+    res.redirect('/admin/products')
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 exports.getProducts = async (req, res, next) => {
-  const [products] = await Products.fetchAll()
+  const user = req.user
 
-  res.render('admin/products', {
-    formatCurrency,
-    prods: products,
-    pageTitle: 'Admin Products',
-    path: '/admin/products'
-  })
+  try {
+    const products = await user.getProducts()
+
+    res.render('admin/products', {
+      formatCurrency,
+      prods: products,
+      pageTitle: 'Admin Products',
+      path: '/admin/products'
+    })
+  } catch (err) {
+    console.error(err)
+  }
 }

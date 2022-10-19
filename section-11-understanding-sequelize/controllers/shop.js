@@ -1,10 +1,10 @@
-const Products = require('../models/product')
+const Product = require('../models/product')
 const Cart = require('../models/cart')
 const { propEquals } = require('../models/helpers/accessors')
 const { formatCurrency, formatParagraphs } = require('../models/helpers/general')
 
 exports.getProducts = async (req, res, next) => {
-  const [products] = await Products.fetchAll()
+  const products = await Product.findAll()
 
   res.render('shop/product-list', {
     formatCurrency,
@@ -15,7 +15,7 @@ exports.getProducts = async (req, res, next) => {
 }
 
 exports.getProduct = async (req, res, next) => {
-  const [[product]] = await Products.fetchById(req.params.productId)
+  const product = await Product.findByPk(req.params.productId)
 
   res.render('shop/product-detail', {
     product,
@@ -27,7 +27,7 @@ exports.getProduct = async (req, res, next) => {
 }
 
 exports.getIndex = async (req, res, next) => {
-  const [products] = await Products.fetchAll()
+  const products = await Product.findAll()
 
   res.render('shop/index', {
     formatCurrency,
@@ -38,7 +38,7 @@ exports.getIndex = async (req, res, next) => {
 }
 
 exports.getCart = async (req, res, next) => {
-  const products = await Products.fetchAll()
+  const products = await Product.findAll()
   const cart = await Cart.fetchAll()
   const cartItems = cart.items.flatMap(({ id, quantity, subTotal }) => {
     const product = products.find(propEquals('id', id))
@@ -66,7 +66,7 @@ exports.getCart = async (req, res, next) => {
 }
 
 exports.postCart = async (req, res, next) => {
-  const product = await Products.fetchById(req.body.id)
+  const product = await Product.findByPk(req.body.id)
 
   Cart.add(product.id, product.price)
   res.redirect('/cart')
