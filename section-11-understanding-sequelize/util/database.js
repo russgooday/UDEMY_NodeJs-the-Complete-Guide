@@ -1,12 +1,13 @@
+require('dotenv').config()
 const Sequelize = require('sequelize').Sequelize
 
 const sequelize = new Sequelize(
-  'node-complete',
-  'russell',
-  'sminkey2010',
+  process.env.DB_DATABASE,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
     dialect: 'mariadb',
-    host: 'localhost'
+    host: process.env.HOST
   }
 )
 
