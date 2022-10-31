@@ -43,6 +43,9 @@
                             <dt>Total</dt>
                             <dd class='cart-item-total'><%- formatCurrency(totalPrice) %></dd>
                         </dl>
+                        <form action='/create-order' method='post' class='align-right'>
+                            <button type='submit'>Order Now</button>
+                        </form>
                     </div>
                 </section>
             </div>

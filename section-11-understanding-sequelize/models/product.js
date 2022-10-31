@@ -35,8 +35,11 @@ const Product = sequelize.define('product',
       allowNull: false
     },
     price: {
-      type: Sequelize.DOUBLE,
-      allowNull: false
+      type: Sequelize.DECIMAL(10, 2),
+      allowNull: false,
+      get () {
+        return parseFloat(this.getDataValue('price'))
+      }
     }
   }
 )

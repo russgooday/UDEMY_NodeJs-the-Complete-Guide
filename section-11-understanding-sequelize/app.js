@@ -1,10 +1,11 @@
 const path = require('path')
-
+const port = process.env.PORT || 8080
 const express = require('express')
 const bodyParser = require('body-parser')
 const errorController = require('./controllers/error')
 const connect = require('./util/connect')
-
+const initialiseUser = require('./util/initialiseUser')
+const httpContext = require('express-http-context')
 const app = express()
 
 app.set('view engine', 'ejs')
@@ -15,33 +16,11 @@ const shopRoutes = require('./routes/shop')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
-
-app.use(async (req, res, next) => {
-  req.user = await User.findByPk(1)
-  next()
-})
-
+app.use(httpContext.middleware)
+app.use(initialiseUser)
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
-
 app.use(errorController.get404)
 
-const User = require('./models/user')
-require('./models/associations')
-
-connect(async () => {
-  try {
-    const user = await User.findByPk(1)
-
-    if (!user) {
-      await User.create({
-        name: 'Russell',
-        email: 'rpg_digital@yahoo.co.uk'
-      })
-    }
-
-    app.listen(process.env.PORT || 8080)
-  } catch (err) {
-    console.error(err)
-  }
-})
+connect(/* force */)
+  .then(() => app.listen(port))

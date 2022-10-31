@@ -1,5 +1,22 @@
 const Product = require('../models/product')
-const { formatCurrency, removeEmptyProps } = require('../models/helpers/general')
+const { formatCurrency, removeEmptyProps } = require('../views/helpers/general')
+
+exports.getProducts = async (req, res, next) => {
+  const userId = req.user.id
+
+  try {
+    const products = await Product.findAll({ where: { userId } })
+
+    res.render('admin/products', {
+      formatCurrency,
+      prods: products,
+      pageTitle: 'Admin Products',
+      path: '/admin/products'
+    })
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 exports.getAddProduct = (req, res) => {
   res.render('admin/edit-product', {
@@ -12,12 +29,10 @@ exports.getAddProduct = (req, res) => {
 }
 
 exports.getEditProduct = async (req, res) => {
-  const id = req.params.productId
-  const user = req.user
   const editMode = req.query.edit
 
   try {
-    const [product] = await user.getProducts({ where: { id } })
+    const product = await Product.findByPk(req.params.id)
 
     res.render('admin/edit-product', {
       product,
@@ -32,8 +47,8 @@ exports.getEditProduct = async (req, res) => {
 }
 
 exports.postAddProduct = async (req, res) => {
-  const { user, body } = req
-  const props = removeEmptyProps(body)
+  const user = req.user
+  const props = removeEmptyProps(req.body)
 
   try {
     await user.createProduct(props)
@@ -47,12 +62,7 @@ exports.postEditProduct = async (req, res) => {
   const { id, ...props } = req.body
 
   try {
-    await Product.update(
-      removeEmptyProps(props),
-      {
-        where: { id }
-      }
-    )
+    await Product.update(props, { where: { id } })
     res.redirect('/admin/products')
   } catch (err) {
     console.error(err)
@@ -65,23 +75,6 @@ exports.postDeleteProduct = async (req, res) => {
   try {
     await Product.destroy({ where: { id } })
     res.redirect('/admin/products')
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-exports.getProducts = async (req, res, next) => {
-  const user = req.user
-
-  try {
-    const products = await user.getProducts()
-
-    res.render('admin/products', {
-      formatCurrency,
-      prods: products,
-      pageTitle: 'Admin Products',
-      path: '/admin/products'
-    })
   } catch (err) {
     console.error(err)
   }

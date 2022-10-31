@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
+    "start": "nodemon --inspect app.js",
     "start-server": "node app.js"
   },
   "author": "Russell Gooday",
@@ -20,6 +20,7 @@
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
+    "express-http-context": "^1.2.4",
     "jsdom": "^20.0.1",
     "mariadb": "^3.0.1",
     "ramda": "^0.28.0",

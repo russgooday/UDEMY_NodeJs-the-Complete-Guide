@@ -1,10 +1,13 @@
-const Product = require('../models/product')
-const Cart = require('../models/cart')
-const { propEquals } = require('../models/helpers/accessors')
-const { formatCurrency, formatParagraphs } = require('../models/helpers/general')
+const userRespository = require('../models/repository/user-repository')
+const cartRespository = require('../models/repository/cart-repository')
+const orderRespository = require('../models/repository/order-repository')
+
+const getCartDisplayFields = require('../models/helpers/cart')
+const getOrderDisplayFields = require('../models/helpers/orders')
+const { formatCurrency, formatParagraphs } = require('../views/helpers/general')
 
 exports.getProducts = async (req, res, next) => {
-  const products = await Product.findAll()
+  const products = await userRespository.getProducts()
 
   res.render('shop/product-list', {
     formatCurrency,
@@ -15,19 +18,19 @@ exports.getProducts = async (req, res, next) => {
 }
 
 exports.getProduct = async (req, res, next) => {
-  const product = await Product.findByPk(req.params.productId)
+  const product = await userRespository.getProduct(req.params.id)
 
   res.render('shop/product-detail', {
     product,
     formatCurrency,
     formatParagraphs,
-    pageTitle: product?.title ?? 'Product Not Found',
+    pageTitle: product?.title || 'Product Not Found',
     path: '/products'
   })
 }
 
 exports.getIndex = async (req, res, next) => {
-  const products = await Product.findAll()
+  const products = await userRespository.getProducts()
 
   res.render('shop/index', {
     formatCurrency,
@@ -37,52 +40,51 @@ exports.getIndex = async (req, res, next) => {
   })
 }
 
+/* --- Cart Methods --- */
+
 exports.getCart = async (req, res, next) => {
-  const products = await Product.findAll()
-  const cart = await Cart.fetchAll()
-  const cartItems = cart.items.flatMap(({ id, quantity, subTotal }) => {
-    const product = products.find(propEquals('id', id))
-
-    if (!product) return []
-
-    return {
-      id,
-      quantity,
-      subTotal,
-      title: product.title,
-      author: product.author,
-      price: product.price,
-      image: product.image
-    }
-  })
+  const user = req.user
+  const { products } = await userRespository.getCart(user)
+  const { items, totalPrice } = getCartDisplayFields(products)
 
   res.render('shop/cart', {
+    items,
+    totalPrice,
     formatCurrency,
-    path: '/cart',
-    pageTitle: 'Your Cart',
-    items: cartItems,
-    totalPrice: cart.totalPrice
+    pageTitle: `${user.name}'s Cart`,
+    path: '/cart'
   })
 }
 
-exports.postCart = async (req, res, next) => {
-  const product = await Product.findByPk(req.body.id)
-
-  Cart.add(product.id, product.price)
+exports.postAddToCart = async (req, res, next) => {
+  await cartRespository.addProduct(req.body.id)
   res.redirect('/cart')
 }
 
-exports.postRemoveItem = (req, res, next) => {
-  const id = req.body.id
-
-  Cart.remove(id)
+exports.postRemoveItem = async (req, res, next) => {
+  await cartRespository.removeProduct(req.body.id)
   res.redirect('/cart')
 }
 
-exports.getOrders = (req, res, next) => {
+/* --- Order Methods --- */
+
+exports.postOrder = async (req, res, next) => {
+  await orderRespository.addOrders()
+  res.redirect('/orders')
+}
+
+exports.getOrders = async (req, res, next) => {
+  const user = req.user
+  const { orders, totalPrice } = getOrderDisplayFields(
+    await orderRespository.getOrders()
+  )
+
   res.render('shop/orders', {
+    orders,
+    totalPrice,
+    formatCurrency,
     path: '/orders',
-    pageTitle: 'Your Orders'
+    pageTitle: `${user.name}'s Orders`
   })
 }
 

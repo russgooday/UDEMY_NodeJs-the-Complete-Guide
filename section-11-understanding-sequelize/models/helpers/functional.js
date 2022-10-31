@@ -1,5 +1,6 @@
 const { curry2, curry3 } = require('./curry')
-const { deepClone } = require('./clone')
+const deepClone = require('./clone')
+const flattenObj = require('./flatten')
 
 /**
    * getByPath
@@ -136,6 +137,7 @@ const not = (a) => !a
 const propEquals = curry3((name, val, obj) => val === obj[name])
 
 module.exports = {
+  flattenObj,
   deepClone,
   getField,
   setField,

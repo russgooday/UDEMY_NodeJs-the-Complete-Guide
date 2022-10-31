@@ -50,7 +50,7 @@ const _deepClone = function (source) {
 }
 
 // if a primitve value or null returns value as is.
-module.exports.deepClone = function (source) {
+module.exports = function (source) {
   return (source !== null && typeof source === 'object')
     ? _deepClone(source)
     : source

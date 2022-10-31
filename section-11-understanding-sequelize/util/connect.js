@@ -1,9 +1,8 @@
 const sequelize = require('./database')
 
-const connect = async (cb, force = false) => {
+const connect = async (force = false) => {
   try {
-    const response = await sequelize.sync({ force })
-    cb(response)
+    return await sequelize.sync({ force })
   } catch (err) {
     console.error(err)
   }

@@ -1,7 +1,7 @@
 /* ------------ simple_clamp ------------- */
 
 @function strip_units($num) {
-    @return calc($num / ($num * 0 + 1));
+    @return calc($num / ($num * 0 + 1rem));
 }
 
 // @params (rem, rem, px, px /*optional px*/)
